@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>RCE Tester</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            background: #f4f4f4;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea,
+        select {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 5px 0 15px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button.submit-btn {
+            background: #28a745;
+        }
+
+        button.submit-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <h2> Simple Online Judge </h2>
+
+    <div class="card">
+        <h3>1. Select a Problem</h3>
+        <select id="prob">
+            <option value="">Loading problems from database...</option>
+        </select>
+    </div>
+
+    <div class="card">
+        <h3>2. Write Solution</h3>
+        <label><strong>Language:</strong></label>
+        <select id="lang">
+            <option value="python">Python 3</option>
+            <option value="cpp">C++ (GCC)</option>
+        </select>
+
+        <label><strong>Code Editor:</strong></label>
+        <textarea id="code" rows="12">import sys
+# Base starter code - prints exactly what it receives
+data = sys.stdin.read()
+print(data.strip())</textarea>
+
+        <button onclick="exec('/api/execute')">▶ Run Code (Samples Only)</button>
+        <button class="submit-btn" onclick="exec('/api/submit')">☁ Submit Solution (All Cases)</button>
+    </div>
+
+    <div class="card">
+        <h3>3. Execution Results</h3>
+        <pre id="out">Waiting for code to run...</pre>
+    </div>
+
+    <script>
+        // Automatically fetch problems on page load
+        async function loadProblems() {
+            try {
+                const r = await fetch('http://localhost:3000/api/problems');
+                const data = await r.json();
+                const select = document.getElementById('prob');
+
+                if (data.length === 0) {
+                    select.innerHTML = '<option value="">No problems found in Supabase Database!</option>';
+                    return;
+                }
+                select.innerHTML = data.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
+                document.getElementById('out').innerText = `Successfully loaded ${data.length} problems!`;
+            } catch (e) {
+                document.getElementById('out').innerText = `Fetch Error: ${e.message}\n(Did you restart your 'npm start' command after I updated server.js?)`;
+            }
+        }
+
+        // Function to run or submit code
+        async function exec(url) {
+            const problemId = document.getElementById('prob').value;
+            const outBox = document.getElementById('out');
+
+            if (!problemId) {
+                outBox.innerText = "Please select a valid problem first!";
+                return;
+            }
+
+            outBox.innerText = "Running code in isolated Docker container...";
+
+            try {
+                const r = await fetch('http://localhost:3000' + url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        problem_id: problemId,
+                        language: document.getElementById('lang').value,
+                        code: document.getElementById('code').value,
+                        user_id: null
+                    })
+                });
+
+                const result = await r.json();
+                outBox.innerText = JSON.stringify(result, null, 2);
+            } catch (e) {
+                outBox.innerText = "Execution failed: " + e.message;
+            }
+        }
+
+        // Trigger load on start
+        loadProblems();
+    </script>
+</body>
+
+</html>

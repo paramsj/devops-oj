@@ -1,0 +1,20 @@
+{
+  "name": "gemini-antigravity-rce",
+  "version": "1.0.0",
+  "description": "High-performance RCE backend using Node.js, Express, Supabase and Dockerode",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.6",
+    "dockerode": "^4.0.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
