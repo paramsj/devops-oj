@@ -1,8 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs "node20" 
+    }
+
     environment {
-        // Store EC2 public IP as Secret Text with this credential ID.
         MY_IP   = credentials('ec2-public-ip')
         EC2_KEY = credentials('aws-ec2-key')
         S_URL   = credentials('supabase-url')
@@ -18,14 +21,14 @@ pipeline {
 
         stage('Install and Test') {
             steps {
-                sh 'npm ci'
+                // Using install instead of ci to be safer for first-time builds
+                sh 'npm install'
                 sh 'npm test'
             }
         }
 
         stage('Generate Configs') {
             steps {
-                // Create deploy-time files in workspace root for deploy.yml copy task.
                 sh """
                 set -eu
 
@@ -48,6 +51,7 @@ EOF
 
         stage('Deploy') {
             steps {
+                // Ensure ansible-playbook is in the PATH or mapped correctly
                 sh "ansible-playbook -i inventory.ini deploy.yml"
             }
         }
