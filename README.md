@@ -111,7 +111,7 @@ Ports:
 For EC2/public deployment, set the frontend API URL before build:
 
 ```bash
-export FRONTEND_API_BASE=http://<your-ec2-public-dns-or-ip>:3000
+export VITE_API_BASE=http://<your-ec2-public-dns-or-ip>:3000
 docker compose up --build -d
 ```
 
