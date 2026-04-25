@@ -41,6 +41,34 @@
             font-size: 14px;
         }
 
+        .problem-statement {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            padding: 12px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .sample-case {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+        .sample-case h4 {
+            margin: 0 0 8px;
+            font-size: 14px;
+        }
+
+        .sample-case pre {
+            margin: 0;
+            background: #121212;
+            font-size: 13px;
+        }
+
         button {
             padding: 10px 15px;
             margin-right: 10px;
@@ -68,12 +96,23 @@
 
 <body>
     <h2> Simple Online Judge </h2>
+    <p><a href="./admin.html">Open Admin Page (Create Problems/Testcases)</a></p>
 
     <div class="card">
         <h3>1. Select a Problem</h3>
         <select id="prob">
             <option value="">Loading problems from database...</option>
         </select>
+    </div>
+
+    <div class="card">
+        <h3>Problem Statement</h3>
+        <div id="statement" class="problem-statement">Select a problem to view its statement.</div>
+    </div>
+
+    <div class="card">
+        <h3>Sample Test Cases</h3>
+        <div id="samples">Select a problem to load sample test cases.</div>
     </div>
 
     <div class="card">
@@ -100,6 +139,8 @@ print(data.strip())</textarea>
     </div>
 
     <script>
+        let problemsById = new Map();
+
         // Automatically fetch problems on page load
         async function loadProblems() {
             try {
@@ -109,13 +150,89 @@ print(data.strip())</textarea>
 
                 if (data.length === 0) {
                     select.innerHTML = '<option value="">No problems found in Supabase Database!</option>';
+                    document.getElementById('statement').innerText = 'No problem statement available.';
+                    document.getElementById('samples').innerText = 'No sample test cases available.';
                     return;
                 }
+
+                problemsById = new Map(data.map(p => [p.id, p]));
                 select.innerHTML = data.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
                 document.getElementById('out').innerText = `Successfully loaded ${data.length} problems!`;
+                await onProblemChange();
             } catch (e) {
                 document.getElementById('out').innerText = `Fetch Error: ${e.message}\n(Did you restart your 'npm start' command after I updated server.js?)`;
             }
+        }
+
+        async function loadSampleTestcases(problemId) {
+            const samplesBox = document.getElementById('samples');
+            samplesBox.innerText = 'Loading sample test cases...';
+
+            try {
+                const r = await fetch(`http://localhost:3000/api/problems/${problemId}/sample-testcases`);
+                const contentType = r.headers.get('content-type') || '';
+
+                if (!r.ok) {
+                    const bodyText = await r.text();
+                    const hint = bodyText.includes('Cannot GET')
+                        ? 'Endpoint missing on running server. Restart backend to load latest routes.'
+                        : bodyText.slice(0, 120);
+                    samplesBox.innerText = `Could not load sample test cases (HTTP ${r.status}). ${hint}`;
+                    return;
+                }
+
+                if (!contentType.includes('application/json')) {
+                    const bodyText = await r.text();
+                    samplesBox.innerText = `Could not load sample test cases: expected JSON, got ${contentType || 'unknown type'} (${bodyText.slice(0, 120)})`;
+                    return;
+                }
+
+                const testcases = await r.json();
+
+                if (!Array.isArray(testcases) || testcases.length === 0) {
+                    samplesBox.innerText = 'No sample test cases available for this problem.';
+                    return;
+                }
+
+                samplesBox.innerHTML = testcases.map((tc, idx) => `
+                    <div class="sample-case">
+                        <h4>Sample #${idx + 1}</h4>
+                        <p><strong>Input:</strong></p>
+                        <pre>${escapeHtml(tc.input || '')}</pre>
+                        <p><strong>Expected Output:</strong></p>
+                        <pre>${escapeHtml(tc.expected_output || '')}</pre>
+                    </div>
+                `).join('');
+            } catch (e) {
+                samplesBox.innerText = `Could not load sample test cases: ${e.message}`;
+            }
+        }
+
+        function escapeHtml(text) {
+            return text
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+        }
+
+        async function onProblemChange() {
+            const problemId = document.getElementById('prob').value;
+            const statementBox = document.getElementById('statement');
+
+            if (!problemId) {
+                statementBox.innerText = 'Select a problem to view its statement.';
+                document.getElementById('samples').innerText = 'Select a problem to load sample test cases.';
+                return;
+            }
+
+            const problem = problemsById.get(problemId);
+            statementBox.innerText = problem && problem.description
+                ? problem.description
+                : 'No description available for this problem.';
+
+            await loadSampleTestcases(problemId);
         }
 
         // Function to run or submit code
@@ -150,6 +267,7 @@ print(data.strip())</textarea>
         }
 
         // Trigger load on start
+        document.getElementById('prob').addEventListener('change', onProblemChange);
         loadProblems();
     </script>
 </body>

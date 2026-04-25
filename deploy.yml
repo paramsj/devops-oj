@@ -1,0 +1,48 @@
+---
+- name: Deploy online-judge on EC2
+  hosts: aws_ec2
+  become: true
+  vars:
+    app_dir: /home/ubuntu/online-judge
+    repo_url: https://github.com/paramsj/devops-oj.git
+    repo_branch: main
+
+  tasks:
+    - name: Ensure base packages are present
+      apt:
+        name:
+          - git
+          - docker.io
+          - docker-compose-plugin
+          - python3
+        state: present
+        update_cache: true
+
+    - name: Ensure docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Ensure ubuntu user can access Docker
+      user:
+        name: ubuntu
+        groups: docker
+        append: true
+
+    - name: Pull latest code from GitHub
+      become: false
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ repo_branch }}"
+        force: true
+
+    - name: Start application with Docker Compose
+      shell: |
+        set -e
+        cd "{{ app_dir }}"
+        docker compose down
+        docker compose up --build -d
+      args:
+        executable: /bin/bash

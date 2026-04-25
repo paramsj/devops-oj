@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OJ Admin - Problem and Testcase Manager</title>
+    <style>
+        :root {
+            --bg: #f3f5f8;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --line: #d1d5db;
+            --primary: #0b57d0;
+            --primary-hover: #0847ac;
+            --success: #15803d;
+            --success-hover: #166534;
+            --warning: #b45309;
+            --danger: #b91c1c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at top right, #dbeafe 0, var(--bg) 45%);
+            color: var(--text);
+            line-height: 1.45;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 28px auto;
+            padding: 0 16px 28px;
+        }
+
+        .title-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        h2 {
+            margin: 0 0 12px;
+            font-size: 19px;
+        }
+
+        .muted {
+            color: var(--muted);
+            margin-top: 0;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        textarea {
+            min-height: 88px;
+            resize: vertical;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--primary);
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        .secondary {
+            background: var(--warning);
+        }
+
+        .secondary:hover {
+            background: #92400e;
+        }
+
+        .success {
+            background: var(--success);
+        }
+
+        .success:hover {
+            background: var(--success-hover);
+        }
+
+        .status {
+            margin-top: 10px;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        .ok {
+            background: #ecfdf3;
+            border: 1px solid #86efac;
+            color: #14532d;
+        }
+
+        .err {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #7f1d1d;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            margin: 12px 0 0;
+        }
+
+        @media (max-width: 760px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <div class="title-row">
+            <h1>Online Judge Admin</h1>
+            <div class="links"><a href="./test.html">Open Judge Runner</a></div>
+        </div>
+
+        <section class="card">
+            <h2>Create Problem</h2>
+            <p class="muted">Equivalent curl: POST /api/problems</p>
+
+            <label for="problemTitle">Title</label>
+            <input id="problemTitle" placeholder="e.g. Sum Two Numbers">
+
+            <label for="problemDescription">Description / Statement</label>
+            <textarea id="problemDescription" placeholder="Write a program that..."></textarea>
+
+            <div class="actions">
+                <button id="createProblemBtn" class="success">Create Problem</button>
+                <button id="reloadProblemsBtn" class="secondary">Reload Problem List</button>
+            </div>
+
+            <div id="problemStatus" class="status" style="display:none"></div>
+            <pre id="problemResponse" style="display:none"></pre>
+        </section>
+
+        <section class="card">
+            <h2>Create Testcase</h2>
+            <p class="muted">Equivalent curl: POST /api/problems/:id/testcases</p>
+
+            <label for="tcProblem">Target Problem</label>
+            <select id="tcProblem">
+                <option value="">Loading...</option>
+            </select>
+
+            <div class="row">
+                <div>
+                    <label for="tcInput">Input</label>
+                    <textarea id="tcInput" placeholder="1\n2"></textarea>
+                </div>
+                <div>
+                    <label for="tcExpected">Expected Output</label>
+                    <textarea id="tcExpected" placeholder="3"></textarea>
+                </div>
+            </div>
+
+            <label for="tcSample">Type</label>
+            <select id="tcSample">
+                <option value="true">Sample testcase</option>
+                <option value="false">Hidden testcase</option>
+            </select>
+
+            <div class="actions">
+                <button id="createTcBtn" class="success">Create Testcase</button>
+            </div>
+
+            <div id="tcStatus" class="status" style="display:none"></div>
+            <pre id="tcResponse" style="display:none"></pre>
+        </section>
+    </main>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+
+        function showStatus(el, ok, msg) {
+            el.style.display = 'block';
+            el.className = `status ${ok ? 'ok' : 'err'}`;
+            el.innerText = msg;
+        }
+
+        async function parseResponse(response) {
+            const text = await response.text();
+            let parsed;
+            try {
+                parsed = JSON.parse(text);
+            } catch {
+                parsed = text;
+            }
+            return { text, parsed };
+        }
+
+        async function loadProblems() {
+            const select = document.getElementById('tcProblem');
+            const problemStatus = document.getElementById('problemStatus');
+            try {
+                const r = await fetch(`${API_BASE}/api/problems`);
+                const { parsed } = await parseResponse(r);
+
+                if (!r.ok || !Array.isArray(parsed)) {
+                    throw new Error('Failed to load problem list from API');
+                }
+
+                if (parsed.length === 0) {
+                    select.innerHTML = '<option value="">No problems found</option>';
+                } else {
+                    select.innerHTML = parsed
+                        .map(p => `<option value="${p.id}">${p.title} (${p.id})</option>`)
+                        .join('');
+                }
+
+                showStatus(problemStatus, true, `Loaded ${parsed.length} problem(s).`);
+            } catch (err) {
+                select.innerHTML = '<option value="">Unable to load problems</option>';
+                showStatus(problemStatus, false, `Problem load failed: ${err.message}`);
+            }
+        }
+
+        async function createProblem() {
+            const title = document.getElementById('problemTitle').value.trim();
+            const description = document.getElementById('problemDescription').value.trim();
+            const status = document.getElementById('problemStatus');
+            const responsePre = document.getElementById('problemResponse');
+
+            if (!title || !description) {
+                showStatus(status, false, 'Title and description are required.');
+                return;
+            }
+
+            try {
+                const r = await fetch(`${API_BASE}/api/problems`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description })
+                });
+
+                const { parsed } = await parseResponse(r);
+
+                if (!r.ok) {
+                    throw new Error((parsed && parsed.error) || 'Problem creation failed');
+                }
+
+                showStatus(status, true, 'Problem created successfully.');
+                responsePre.style.display = 'block';
+                responsePre.innerText = JSON.stringify(parsed, null, 2);
+
+                await loadProblems();
+            } catch (err) {
+                showStatus(status, false, err.message);
+            }
+        }
+
+        async function createTestcase() {
+            const problemId = document.getElementById('tcProblem').value;
+            const input = document.getElementById('tcInput').value;
+            const expectedOutput = document.getElementById('tcExpected').value;
+            const isSample = document.getElementById('tcSample').value === 'true';
+            const status = document.getElementById('tcStatus');
+            const responsePre = document.getElementById('tcResponse');
+
+            if (!problemId) {
+                showStatus(status, false, 'Please select a target problem.');
+                return;
+            }
+
+            try {
+                const r = await fetch(`${API_BASE}/api/problems/${problemId}/testcases`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        input,
+                        expected_output: expectedOutput,
+                        is_sample: isSample
+                    })
+                });
+
+                const { parsed } = await parseResponse(r);
+
+                if (!r.ok) {
+                    throw new Error((parsed && parsed.error) || 'Testcase creation failed');
+                }
+
+                showStatus(status, true, `Testcase created (${isSample ? 'sample' : 'hidden'}).`);
+                responsePre.style.display = 'block';
+                responsePre.innerText = JSON.stringify(parsed, null, 2);
+            } catch (err) {
+                showStatus(status, false, err.message);
+            }
+        }
+
+        document.getElementById('createProblemBtn').addEventListener('click', createProblem);
+        document.getElementById('reloadProblemsBtn').addEventListener('click', loadProblems);
+        document.getElementById('createTcBtn').addEventListener('click', createTestcase);
+
+        loadProblems();
+    </script>
+</body>
+
+</html>

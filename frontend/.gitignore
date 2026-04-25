@@ -57,7 +57,3 @@ docs/_build/
 *.log
 *.zip
 *.tar.gz
-
-# Ansible local/deployment secrets
-inventory.ini
-*.pem

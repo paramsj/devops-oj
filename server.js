@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import { executeCode } from './runner.js';
+import { ensureRuntimeImages, executeCode } from './runner.js';
 
 dotenv.config();
 
@@ -69,6 +69,24 @@ app.post('/api/problems/:id/testcases', async (req, res) => {
         if (error) throw error;
         
         res.status(201).json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Endpoint to fetch sample testcases for a specific problem
+app.get('/api/problems/:id/sample-testcases', async (req, res) => {
+    try {
+        const problem_id = req.params.id;
+        const { data, error } = await supabase
+            .from('testcases')
+            .select('id, input, expected_output')
+            .eq('problem_id', problem_id)
+            .eq('is_sample', true)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        res.json(data || []);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -182,7 +200,18 @@ app.post('/api/submit', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-    console.log(`Ensure that you have pulled python:3.10-slim and gcc:latest docker images!`);
-});
+
+async function startServer() {
+    try {
+        await ensureRuntimeImages();
+    } catch (err) {
+        console.error(`Failed to ensure runtime images: ${err.message}`);
+        console.error('Code execution may fail until images are available.');
+    }
+
+    app.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+    });
+}
+
+startServer();

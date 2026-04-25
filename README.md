@@ -83,6 +83,65 @@ Or start normally:
 npm start
 ```
 
+## Docker Compose (No Nginx)
+
+Run backend and frontend together with one command:
+
+```bash
+docker compose up --build -d
+```
+
+Stop everything:
+
+```bash
+docker compose down
+```
+
+Logs:
+
+```bash
+docker compose logs -f
+```
+
+Ports:
+
+- Backend API: `http://localhost:3000`
+- Frontend: `http://localhost:5173`
+
+For EC2/public deployment, set the frontend API URL before build:
+
+```bash
+export FRONTEND_API_BASE=http://<your-ec2-public-dns-or-ip>:3000
+docker compose up --build -d
+```
+
+The compose setup mounts `/var/run/docker.sock` into backend so `dockerode` can create runner containers.
+
+## React Frontend (New)
+
+The old HTML pages are now ported into a React app under [frontend](frontend).
+
+1. Install frontend dependencies:
+```bash
+cd frontend
+npm install
+```
+
+2. Start React dev server:
+```bash
+npm run dev
+```
+
+You can also run these from project root:
+```bash
+npm run frontend:dev
+npm run frontend:build
+npm run frontend:preview
+```
+
+Default frontend URL (Vite): `http://localhost:5173`.
+It calls backend APIs at `http://localhost:3000`.
+
 ## API Testing Reference
 
 ### Create a Problem

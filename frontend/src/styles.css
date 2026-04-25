@@ -1,0 +1,140 @@
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: 40px auto;
+  background: #f4f4f4;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+textarea,
+select,
+input {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 5px 0 15px;
+  font-family: monospace;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+pre {
+  background: #1e1e1e;
+  color: #fff;
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font-size: 14px;
+}
+
+.problem-statement {
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  padding: 12px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.sample-case {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.sample-case h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.sample-case pre {
+  margin: 0;
+  background: #121212;
+  font-size: 13px;
+}
+
+button {
+  padding: 10px 15px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+button.submit-btn {
+  background: #28a745;
+}
+
+button.submit-btn:hover {
+  background: #218838;
+}
+
+button.secondary-btn {
+  background: #6b7280;
+}
+
+button.secondary-btn:hover {
+  background: #4b5563;
+}
+
+.nav-card {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  margin: 0;
+  background: #64748b;
+}
+
+.nav-btn.active {
+  background: #0f172a;
+}
+
+.muted {
+  color: #6b7280;
+  margin-top: 0;
+}
+
+.status {
+  margin-top: 10px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.status.ok {
+  background: #ecfdf3;
+  border: 1px solid #86efac;
+  color: #14532d;
+}
+
+.status.err {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #7f1d1d;
+}

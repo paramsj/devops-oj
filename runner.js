@@ -1,6 +1,39 @@
 import Docker from 'dockerode';
 
 const docker = new Docker(); // Connects to /var/run/docker.sock by default
+const REQUIRED_IMAGES = ['python:3.10-slim', 'gcc:latest'];
+
+function pullImage(image) {
+    return new Promise((resolve, reject) => {
+        docker.pull(image, (err, stream) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            docker.modem.followProgress(stream, (followErr) => {
+                if (followErr) {
+                    reject(followErr);
+                    return;
+                }
+                resolve();
+            });
+        });
+    });
+}
+
+export async function ensureRuntimeImages() {
+    for (const image of REQUIRED_IMAGES) {
+        try {
+            await docker.getImage(image).inspect();
+            console.log(`Runtime image ready: ${image}`);
+        } catch {
+            console.log(`Runtime image missing, pulling: ${image}`);
+            await pullImage(image);
+            console.log(`Pulled runtime image: ${image}`);
+        }
+    }
+}
 
 /**
  * Executes a given code against a set of test cases in an isolated Docker container.
