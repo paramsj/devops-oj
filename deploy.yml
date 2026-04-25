@@ -8,15 +8,24 @@
     repo_branch: main
 
   tasks:
+    - name: Gather installed package facts
+      package_facts:
+        manager: auto
+
     - name: Ensure base packages are present
       apt:
         name:
           - git
-          - docker.io
           - docker-compose-plugin
           - python3
         state: present
         update_cache: true
+
+    - name: Ensure docker.io is present when containerd.io is not installed
+      apt:
+        name: docker.io
+        state: present
+      when: "'containerd.io' not in ansible_facts.packages"
 
     - name: Ensure docker service is running
       service:
@@ -37,6 +46,14 @@
         dest: "{{ app_dir }}"
         version: "{{ repo_branch }}"
         force: true
+
+    - name: Inject environment variables
+      copy:
+        src: ./.env
+        dest: "{{ app_dir }}/.env"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'
 
     - name: Start application with Docker Compose
       shell: |
