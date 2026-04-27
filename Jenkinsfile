@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/paramsj/devops-oj.git'
+                git branch: 'dep_v2', url: 'https://github.com/paramsj/devops-oj.git'
             }
         }
 

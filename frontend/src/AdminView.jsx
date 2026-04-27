@@ -1,5 +1,5 @@
-import React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Settings, PlusCircle, Database, CheckCircle, AlertTriangle } from 'lucide-react';
 
 export default function AdminView() {
   const apiBase = useMemo(() => import.meta.env.VITE_API_BASE || 'http://localhost:3000', []);
@@ -16,11 +16,9 @@ export default function AdminView() {
 
   const [problemStatus, setProblemStatus] = useState('');
   const [problemStatusOk, setProblemStatusOk] = useState(false);
-  const [problemResponse, setProblemResponse] = useState('');
 
   const [tcStatus, setTcStatus] = useState('');
   const [tcStatusOk, setTcStatusOk] = useState(false);
-  const [tcResponse, setTcResponse] = useState('');
 
   useEffect(() => {
     loadProblems();
@@ -46,13 +44,9 @@ export default function AdminView() {
 
       setProblems(parsed);
       setTcProblem((prev) => prev || parsed[0]?.id || '');
-      setProblemStatusOk(true);
-      setProblemStatus(`Loaded ${parsed.length} problem(s).`);
     } catch (err) {
       setProblems([]);
       setTcProblem('');
-      setProblemStatusOk(false);
-      setProblemStatus(`Problem load failed: ${err.message}`);
     }
   }
 
@@ -79,8 +73,7 @@ export default function AdminView() {
       }
 
       setProblemStatusOk(true);
-      setProblemStatus('Problem created successfully.');
-      setProblemResponse(JSON.stringify(parsed, null, 2));
+      setProblemStatus(`Problem '${title}' created successfully.`);
       setProblemTitle('');
       setProblemDescription('');
 
@@ -115,8 +108,7 @@ export default function AdminView() {
       }
 
       setTcStatusOk(true);
-      setTcStatus(`Testcase created (${tcSample === 'true' ? 'sample' : 'hidden'}).`);
-      setTcResponse(JSON.stringify(parsed, null, 2));
+      setTcStatus(`Testcase created successfully (${tcSample === 'true' ? 'Sample' : 'Hidden'}).`);
       setTcInput('');
       setTcExpected('');
     } catch (err) {
@@ -126,67 +118,111 @@ export default function AdminView() {
   }
 
   return (
-    <>
-      <div className="card">
-        <h3>Create Problem</h3>
-        <p className="muted">Equivalent curl: POST /api/problems</p>
-
-        <label>Title</label>
-        <input
-          value={problemTitle}
-          onChange={(e) => setProblemTitle(e.target.value)}
-          placeholder="e.g. Sum Two Numbers"
-        />
-
-        <label>Description / Statement</label>
-        <textarea
-          value={problemDescription}
-          onChange={(e) => setProblemDescription(e.target.value)}
-          rows="6"
-          placeholder="Write a program that..."
-        />
-
-        <button className="submit-btn" onClick={createProblem}>Create Problem</button>
-        <button className="secondary-btn" onClick={loadProblems}>Reload Problem List</button>
-
-        {problemStatus ? <div className={`status ${problemStatusOk ? 'ok' : 'err'}`}>{problemStatus}</div> : null}
-        {problemResponse ? <pre>{problemResponse}</pre> : null}
+    <div className="admin-container">
+      <div style={{ marginBottom: '2rem' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.8rem' }}>
+          <Settings color="#a855f7" />
+          Admin Dashboard
+        </h2>
+        <p className="muted-text">Manage problems, test cases, and platform settings.</p>
       </div>
 
-      <div className="card">
-        <h3>Create Testcase</h3>
-        <p className="muted">Equivalent curl: POST /api/problems/:id/testcases</p>
+      <div className="admin-grid">
+        {/* Create Problem Card */}
+        <div className="card">
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <PlusCircle size={20} color="#6366f1" />
+            Create Problem
+          </h3>
+          <p className="muted-text">Add a new coding challenge to the platform.</p>
 
-        <label>Target Problem</label>
-        <select value={tcProblem} onChange={(e) => setTcProblem(e.target.value)}>
-          {problems.length === 0 ? (
-            <option value="">No problems found</option>
-          ) : (
-            problems.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.title} ({p.id})
-              </option>
-            ))
+          <label>Problem Title</label>
+          <input
+            value={problemTitle}
+            onChange={(e) => setProblemTitle(e.target.value)}
+            placeholder="e.g. Sum Two Numbers"
+          />
+
+          <label>Description / Statement (Markdown supported)</label>
+          <textarea
+            value={problemDescription}
+            onChange={(e) => setProblemDescription(e.target.value)}
+            rows="8"
+            placeholder="Write a program that takes two integers and prints their sum..."
+          />
+
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <button className="btn btn-primary" onClick={createProblem} style={{ flex: 1, justifyContent: 'center' }}>
+              Create Problem
+            </button>
+            <button className="btn btn-secondary" onClick={loadProblems}>
+              <Database size={16} />
+            </button>
+          </div>
+
+          {problemStatus && (
+            <div className={`status-msg ${problemStatusOk ? 'success' : 'error'}`}>
+              {problemStatusOk ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
+              {problemStatus}
+            </div>
           )}
-        </select>
+        </div>
 
-        <label>Input</label>
-        <textarea value={tcInput} onChange={(e) => setTcInput(e.target.value)} rows="4" placeholder={'1\n2'} />
+        {/* Create Testcase Card */}
+        <div className="card">
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <Database size={20} color="#10b981" />
+            Add Testcase
+          </h3>
+          <p className="muted-text">Attach sample or hidden test cases to an existing problem.</p>
 
-        <label>Expected Output</label>
-        <textarea value={tcExpected} onChange={(e) => setTcExpected(e.target.value)} rows="4" placeholder="3" />
+          <label>Target Problem</label>
+          <select value={tcProblem} onChange={(e) => setTcProblem(e.target.value)}>
+            {problems.length === 0 ? (
+              <option value="">No problems found</option>
+            ) : (
+              problems.map((p) => (
+                <option key={p.id} value={p.id} style={{color: '#000'}}>
+                  {p.title}
+                </option>
+              ))
+            )}
+          </select>
 
-        <label>Type</label>
-        <select value={tcSample} onChange={(e) => setTcSample(e.target.value)}>
-          <option value="true">Sample testcase</option>
-          <option value="false">Hidden testcase</option>
-        </select>
+          <label>Input Data</label>
+          <textarea 
+            value={tcInput} 
+            onChange={(e) => setTcInput(e.target.value)} 
+            rows="3" 
+            placeholder="1&#10;2" 
+          />
 
-        <button className="submit-btn" onClick={createTestcase}>Create Testcase</button>
+          <label>Expected Output</label>
+          <textarea 
+            value={tcExpected} 
+            onChange={(e) => setTcExpected(e.target.value)} 
+            rows="3" 
+            placeholder="3" 
+          />
 
-        {tcStatus ? <div className={`status ${tcStatusOk ? 'ok' : 'err'}`}>{tcStatus}</div> : null}
-        {tcResponse ? <pre>{tcResponse}</pre> : null}
+          <label>Testcase Visibility</label>
+          <select value={tcSample} onChange={(e) => setTcSample(e.target.value)}>
+            <option value="true" style={{color: '#000'}}>Sample (Visible to users)</option>
+            <option value="false" style={{color: '#000'}}>Hidden (For evaluation only)</option>
+          </select>
+
+          <button className="btn btn-success" onClick={createTestcase} style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>
+            Save Testcase
+          </button>
+
+          {tcStatus && (
+            <div className={`status-msg ${tcStatusOk ? 'success' : 'error'}`}>
+              {tcStatusOk ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
+              {tcStatus}
+            </div>
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

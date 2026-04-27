@@ -1,7 +1,7 @@
-import React from 'react';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import RunnerView from './RunnerView';
 import AdminView from './AdminView';
+import { Code2, LayoutDashboard, Terminal } from 'lucide-react';
 
 export default function App() {
   const initialTab = useMemo(() => {
@@ -16,24 +16,33 @@ export default function App() {
   }
 
   return (
-    <main className="container">
-      <h2> Simple Online Judge </h2>
-      <div className="card nav-card">
-        <button
-          className={`nav-btn ${tab === 'runner' ? 'active' : ''}`}
-          onClick={() => setActiveTab('runner')}
-        >
-          Runner
-        </button>
-        <button
-          className={`nav-btn ${tab === 'admin' ? 'active' : ''}`}
-          onClick={() => setActiveTab('admin')}
-        >
-          Admin
-        </button>
-      </div>
+    <div className="app-container">
+      <nav className="navbar">
+        <div className="brand">
+          <Terminal size={28} color="#a855f7" />
+          ProJudge
+        </div>
+        <div className="nav-links">
+          <button
+            className={`nav-btn ${tab === 'runner' ? 'active' : ''}`}
+            onClick={() => setActiveTab('runner')}
+          >
+            <Code2 size={18} />
+            Code Arena
+          </button>
+          <button
+            className={`nav-btn ${tab === 'admin' ? 'active' : ''}`}
+            onClick={() => setActiveTab('admin')}
+          >
+            <LayoutDashboard size={18} />
+            Dashboard
+          </button>
+        </div>
+      </nav>
 
-      {tab === 'runner' ? <RunnerView /> : <AdminView />}
-    </main>
+      <div className="main-content">
+        {tab === 'runner' ? <RunnerView /> : <AdminView />}
+      </div>
+    </div>
   );
 }
