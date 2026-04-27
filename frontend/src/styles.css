@@ -12,7 +12,7 @@
   --success-hover: #059669;
   --danger: #ef4444;
   --border-color: rgba(255, 255, 255, 0.08);
-  --gradient-brand: #ffffff;
+  --gradient-brand: linear-gradient(135deg, #f12929, #252222, #c59eb1);
 }
 
 body {
@@ -529,6 +529,135 @@ pre {
 
   .admin-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Tablet and Mobile adjustments */
+@media (max-width: 768px) {
+
+  /* Let the page scroll naturally on mobile */
+  .app-container {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .main-content {
+    overflow: visible;
+    flex-direction: column;
+  }
+
+  .split-pane {
+    height: auto;
+  }
+
+  .left-pane,
+  .right-pane {
+    height: auto;
+    min-height: 50vh;
+    overflow: visible;
+  }
+
+  .pane-content {
+    overflow: visible;
+    padding: 1rem;
+  }
+
+  .editor-container {
+    height: 450px;
+    flex: none;
+  }
+
+  .console-panel {
+    height: auto;
+    min-height: 300px;
+    flex: none;
+  }
+
+  /* Navbar */
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Editor Header */
+  .editor-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .lang-select {
+    width: 100%;
+  }
+
+  .action-bar {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  /* Console Tabs */
+  .console-tabs-header {
+    flex-wrap: wrap;
+  }
+
+  .console-tab {
+    flex: 1;
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+  }
+
+  .console-tabs-header span {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+
+  /* Admin View */
+  .admin-container {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* Extra tweaks for very small phones */
+  .brand {
+    font-size: 1.25rem;
+  }
+
+  .result-tabs {
+    flex-direction: column;
+  }
+
+  .result-tab-btn {
+    width: 100%;
+    text-align: center;
   }
 }
 
