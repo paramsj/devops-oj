@@ -517,9 +517,20 @@ pre {
 }
 
 @media (max-width: 1024px) {
+  .app-container {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .main-content {
+    overflow: visible;
+  }
+
   .split-pane {
     flex-direction: column;
-    overflow-y: auto;
+    overflow-y: visible;
+    height: auto;
   }
 
   .left-pane,
@@ -527,7 +538,16 @@ pre {
     border-right: none;
     border-bottom: 1px solid var(--border-color);
     flex: none;
-    min-height: 50vh;
+    height: auto;
+    overflow: visible;
+  }
+  
+  .left-pane {
+    min-height: auto;
+  }
+
+  .right-pane {
+    min-height: 80vh;
   }
 
   .admin-grid {
