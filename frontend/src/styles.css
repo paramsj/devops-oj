@@ -12,7 +12,7 @@
   --success-hover: #059669;
   --danger: #ef4444;
   --border-color: rgba(255, 255, 255, 0.08);
-  --gradient-brand: linear-gradient(135deg, #f12929, #252222, #c59eb1);
+  --gradient-brand: #ffffff;
 }
 
 body {
