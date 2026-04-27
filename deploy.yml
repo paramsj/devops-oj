@@ -5,7 +5,7 @@
   vars:
     app_dir: /home/ubuntu/online-judge
     repo_url: https://github.com/paramsj/devops-oj.git
-    repo_branch: main
+    repo_branch: dep_v2
 
   tasks:
     - name: Gather installed package facts
