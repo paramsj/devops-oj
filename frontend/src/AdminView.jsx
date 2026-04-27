@@ -120,6 +120,7 @@ export default function AdminView() {
   return (
     <div className="admin-container">
       <div style={{ marginBottom: '2rem' }}>
+
         <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.8rem' }}>
           <Settings color="#a855f7" />
           Admin Dashboard
@@ -182,7 +183,7 @@ export default function AdminView() {
               <option value="">No problems found</option>
             ) : (
               problems.map((p) => (
-                <option key={p.id} value={p.id} style={{color: '#000'}}>
+                <option key={p.id} value={p.id} style={{ color: '#000' }}>
                   {p.title}
                 </option>
               ))
@@ -190,25 +191,25 @@ export default function AdminView() {
           </select>
 
           <label>Input Data</label>
-          <textarea 
-            value={tcInput} 
-            onChange={(e) => setTcInput(e.target.value)} 
-            rows="3" 
-            placeholder="1&#10;2" 
+          <textarea
+            value={tcInput}
+            onChange={(e) => setTcInput(e.target.value)}
+            rows="3"
+            placeholder="1&#10;2"
           />
 
           <label>Expected Output</label>
-          <textarea 
-            value={tcExpected} 
-            onChange={(e) => setTcExpected(e.target.value)} 
-            rows="3" 
-            placeholder="3" 
+          <textarea
+            value={tcExpected}
+            onChange={(e) => setTcExpected(e.target.value)}
+            rows="3"
+            placeholder="3"
           />
 
           <label>Testcase Visibility</label>
           <select value={tcSample} onChange={(e) => setTcSample(e.target.value)}>
-            <option value="true" style={{color: '#000'}}>Sample (Visible to users)</option>
-            <option value="false" style={{color: '#000'}}>Hidden (For evaluation only)</option>
+            <option value="true" style={{ color: '#000' }}>Sample (Visible to users)</option>
+            <option value="false" style={{ color: '#000' }}>Hidden (For evaluation only)</option>
           </select>
 
           <button className="btn btn-success" onClick={createTestcase} style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>

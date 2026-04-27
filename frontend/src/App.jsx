@@ -19,7 +19,7 @@ export default function App() {
     <div className="app-container">
       <nav className="navbar">
         <div className="brand">
-          <Terminal size={28} color="white" />
+          <Terminal size={28} color="#ffffffff" />
           ProJudge
         </div>
         <div className="nav-links">
