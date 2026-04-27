@@ -12,14 +12,14 @@
   --success-hover: #059669;
   --danger: #ef4444;
   --border-color: rgba(255, 255, 255, 0.08);
-  --gradient-brand: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+  --gradient-brand: linear-gradient(135deg, #f12929, #252222, #c59eb1);
 }
 
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   background-color: var(--bg-dark);
-  background-image: 
+  background-image:
     radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
   background-attachment: fixed;
@@ -34,7 +34,10 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   color: #fff;
   margin-top: 0;
   font-weight: 600;
@@ -113,7 +116,8 @@ h1, h2, h3, h4 {
   height: 100%;
 }
 
-.left-pane, .right-pane {
+.left-pane,
+.right-pane {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -139,13 +143,16 @@ h1, h2, h3, h4 {
 .pane-content::-webkit-scrollbar {
   width: 8px;
 }
+
 .pane-content::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .pane-content::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
+
 .pane-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
@@ -166,7 +173,9 @@ h1, h2, h3, h4 {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
-select, input, textarea {
+select,
+input,
+textarea {
   width: 100%;
   background: rgba(0, 0, 0, 0.3);
   color: #fff;
@@ -179,7 +188,9 @@ select, input, textarea {
   outline: none;
 }
 
-select:focus, input:focus, textarea:focus {
+select:focus,
+input:focus,
+textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
@@ -268,7 +279,7 @@ pre {
   font-family: 'Fira Code', monospace;
   font-size: 0.9rem;
   overflow-x: auto;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Editor Area */
@@ -319,6 +330,7 @@ pre {
   background: var(--accent);
   color: white;
 }
+
 .btn-primary:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
@@ -328,6 +340,7 @@ pre {
   background: var(--success);
   color: white;
 }
+
 .btn-success:hover {
   background: var(--success-hover);
   transform: translateY(-1px);
@@ -337,6 +350,7 @@ pre {
   background: rgba(255, 255, 255, 0.1);
   color: white;
 }
+
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.15);
 }
@@ -506,10 +520,13 @@ pre {
   .split-pane {
     flex-direction: column;
   }
-  .left-pane, .right-pane {
+
+  .left-pane,
+  .right-pane {
     border-right: none;
     border-bottom: 1px solid var(--border-color);
   }
+
   .admin-grid {
     grid-template-columns: 1fr;
   }
