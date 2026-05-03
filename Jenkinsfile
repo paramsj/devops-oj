@@ -27,6 +27,25 @@ pipeline {
             }
         }
 
+        stage('SonarCloud Analysis') {
+            environment {
+                // Ensure you have added your SonarCloud token to Jenkins credentials with ID 'sonarcloud-token'
+                SONAR_TOKEN = credentials('sonarcloud-token')
+            }
+            steps {
+                // Using npx to run sonar-scanner without needing to install the Jenkins plugin
+                sh '''
+                npx sonar-scanner \
+                  -Dsonar.projectKey=paramsj_devops-oj \
+                  -Dsonar.organization=paramsj \
+                  -Dsonar.host.url=https://sonarcloud.io \
+                  -Dsonar.sources=. \
+                  -Dsonar.exclusions=**/node_modules/**,**/coverage/** \
+                  -Dsonar.token=$SONAR_TOKEN
+                '''
+            }
+        }
+
         stage('Generate Configs') {
             steps {
                 sh """
