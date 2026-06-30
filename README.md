@@ -188,4 +188,121 @@ curl -X POST http://localhost:3000/api/submit \
   "code": "import sys; a, b = sys.stdin.read().split(); print(int(a) + int(b))",
   "user_id": null
 }'
+``
+
+---
+
+# Code Execution and Isolation Strategy
+
+One of the most important design decisions in an Online Judge is selecting a secure and efficient execution environment for running untrusted user programs. Since submitted code may contain malicious logic, infinite loops, or resource-intensive operations, the execution environment must provide strong isolation while maintaining acceptable performance.
+
+The project evaluates three common approaches to container execution.
+
+| Feature | Docker-out-of-Docker (DooD) | Docker-in-Docker (DinD) | gVisor |
+|----------|-----------------------------|-------------------------|--------|
+| Execution Model | Uses the host Docker daemon through `/var/run/docker.sock` | Runs an independent Docker daemon inside a container | Uses a user-space kernel (`runsc`) to sandbox containers |
+| Isolation | Low | Moderate | High |
+| Performance | Excellent | Good | Good (minor syscall overhead) |
+| Resource Usage | Low | High | Moderate |
+| Host Security | Poor | Better than DooD | Excellent |
+| Requires `--privileged` | No | Usually Yes | No |
+| Suitable for Running Untrusted Code | No | Partially | Yes |
+
+## Docker-out-of-Docker (DooD)
+
+In Docker-out-of-Docker, the runner container mounts the host's Docker socket (`/var/run/docker.sock`) and communicates directly with the host Docker daemon.
+
 ```
+Runner Container
+        │
+ docker.sock
+        │
+        ▼
+ Host Docker Daemon
+        │
+        ▼
+Execution Containers
+```
+
+This approach has very little overhead because it reuses the host daemon and image cache. However, it introduces significant security concerns.
+
+Since the runner has access to the host Docker daemon, a malicious submission that compromises the runner could potentially:
+
+- Start privileged containers
+- Mount host filesystems
+- Modify or delete host resources
+- Escape container isolation entirely
+
+For an Online Judge where arbitrary user code is executed, this level of access is generally considered unacceptable.
+
+---
+
+## Docker-in-Docker (DinD)
+
+Docker-in-Docker launches a completely separate Docker daemon inside the runner container.
+
+```
+Runner Container
+    Docker Daemon
+         │
+         ▼
+ Execution Containers
+```
+
+Because the inner daemon is isolated from the host daemon, child containers are managed independently.
+
+Advantages include:
+
+- Better isolation than DooD
+- Independent image management
+- Clean execution environments
+
+However, DinD commonly requires the parent container to run with the `--privileged` flag. While this simplifies nested container management, it grants broad kernel capabilities and weakens the overall security boundary.
+
+Additionally, running a full Docker daemon inside another container increases CPU, memory, and storage overhead.
+
+DinD is widely used for CI/CD pipelines but is generally not the preferred solution for executing untrusted user submissions.
+
+---
+
+## gVisor
+
+gVisor is a container runtime developed by Google that provides an additional security layer between containers and the host kernel.
+
+```
+Application
+      │
+System Calls
+      │
+   gVisor Sentry
+      │
+ Host Linux Kernel
+```
+
+Instead of allowing containers to invoke the host kernel directly, gVisor intercepts and emulates many Linux system calls within a user-space kernel known as the **Sentry**.
+
+This significantly reduces the attack surface exposed to potentially malicious workloads.
+
+Advantages include:
+
+- Strong syscall isolation
+- Reduced kernel attack surface
+- No privileged containers required
+- Native integration with Docker through the `runsc` runtime
+- Fast startup compared to virtual machines
+
+The primary trade-off is a modest performance overhead for system-call-intensive workloads. However, for most programming contest submissions, this overhead is negligible compared to the security benefits.
+
+---
+
+# Recommended Approach
+
+For an Online Judge, security is significantly more important than maximizing raw execution speed. User programs are inherently untrusted and must not be allowed to compromise the host system.
+
+Among the evaluated approaches:
+
+- **Docker-out-of-Docker** offers the best performance but exposes the host Docker daemon, making it unsuitable for executing untrusted code.
+- **Docker-in-Docker** improves isolation but typically depends on privileged containers, which still present security concerns and introduce additional resource overhead.
+- **gVisor** provides the strongest balance between isolation, security, and performance by inserting a lightweight user-space kernel between the application and the host operating system.
+
+For these reasons, **gVisor is the recommended runtime for production deployments of the Online Judge**, while Docker-in-Docker may still be useful for isolated testing or CI environments where privileged execution is acceptable.`
